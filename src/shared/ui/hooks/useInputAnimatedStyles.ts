@@ -13,28 +13,28 @@ export const useInputAnimatedStyles = ({ value, error, focused }: UseInputAnimat
   const animatedColorState = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.timing(animated, {
-      toValue: focused ? 1 : 0,
-      duration: 180,
-      useNativeDriver: false,
-    }).start();
-  }, [focused, animated]);
+    const animations = [];
 
-  useEffect(() => {
-    let toValue = 0;
+    animations.push(
+      Animated.timing(animated, {
+        toValue: focused ? 1 : 0,
+        duration: 180,
+        useNativeDriver: false,
+      }),
+    );
 
-    if (error) {
-      toValue = 2;
-    } else if (focused || value) {
-      toValue = 1;
-    }
+    const colorToValue = error ? 2 : focused || value ? 1 : 0;
 
-    Animated.timing(animatedColorState, {
-      toValue,
-      duration: 180,
-      useNativeDriver: false,
-    }).start();
-  }, [error, focused, value, animatedColorState]);
+    animations.push(
+      Animated.timing(animatedColorState, {
+        toValue: colorToValue,
+        duration: 180,
+        useNativeDriver: false,
+      }),
+    );
+
+    Animated.parallel(animations).start();
+  }, [focused, error, value, animated, animatedColorState]);
 
   const labelStyle = {
     top: animated.interpolate({
@@ -63,6 +63,10 @@ export const useInputAnimatedStyles = ({ value, error, focused }: UseInputAnimat
     fontSize: animated.interpolate({
       inputRange: [0, 1],
       outputRange: [16, 12],
+    }),
+    paddingTop: animated.interpolate({
+      inputRange: [0, 1],
+      outputRange: [4, 12],
     }),
   };
 

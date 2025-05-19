@@ -106,9 +106,6 @@ const styles = StyleSheet.create({
 
     height: 53,
     fontWeight: '400',
-
-    paddingTop: 24,
-    paddingBottom: 8,
   },
 
   labelStyle: {
