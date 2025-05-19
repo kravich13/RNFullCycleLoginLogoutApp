@@ -29,6 +29,7 @@ export const LoginForm = memo(
           <Input
             placeholder="Enter username"
             activePlaceholder="Username"
+            error={Boolean(errors.userName)}
             inputProps={{
               value: values.userName,
               onChangeText: handleChange('userName'),
@@ -45,6 +46,7 @@ export const LoginForm = memo(
           <Input
             placeholder="Enter password"
             activePlaceholder="Password"
+            error={Boolean(errors.password)}
             inputProps={{
               value: values.password,
               onChangeText: handleChange('password'),
