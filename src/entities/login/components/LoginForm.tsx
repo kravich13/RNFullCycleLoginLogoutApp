@@ -1,28 +1,65 @@
-import { GradientButton, Input } from '@wearepush/shared/ui';
+import { Colors } from '@wearepush/shared/consts';
+import { IHandleFormikChange } from '@wearepush/shared/types';
+import { Input } from '@wearepush/shared/ui';
+import { FormikErrors, FormikTouched } from 'formik';
 import React, { memo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import {
+  NativeSyntheticEvent,
+  StyleSheet,
+  Text,
+  TextInputFocusEventData,
+  View,
+} from 'react-native';
+import { ILoginFormValues } from '../types';
 
-export const LoginForm = memo(() => {
-  return (
-    <>
-      <View style={[styles.inputContainer, styles.firstInputContainer]}>
-        <Input placeholder="Enter username" activePlaceholder="Username" />
-      </View>
+type FormikHandleBlurType = (e: NativeSyntheticEvent<TextInputFocusEventData>) => void;
 
-      <View style={styles.inputContainer}>
-        <Input placeholder="Enter password" activePlaceholder="Password" />
-      </View>
+interface LoginFormProps extends IHandleFormikChange<keyof ILoginFormValues> {
+  values: ILoginFormValues;
+  errors: FormikErrors<ILoginFormValues>;
+  touched: FormikTouched<ILoginFormValues>;
+  handleBlur: (field: keyof ILoginFormValues) => void;
+}
 
-      <GradientButton
-        title="Login"
-        fullWidth
-        style={styles.gradientButton}
-        disabled
-        onPress={() => {}}
-      />
-    </>
-  );
-});
+export const LoginForm = memo(
+  ({ values, handleChange, errors, touched, handleBlur }: LoginFormProps) => {
+    return (
+      <>
+        <View style={[styles.inputContainer, styles.firstInputContainer]}>
+          <Input
+            placeholder="Enter username"
+            activePlaceholder="Username"
+            inputProps={{
+              value: values.userName,
+              onChangeText: handleChange('userName'),
+              onBlur: handleBlur('userName') as unknown as FormikHandleBlurType,
+            }}
+          />
+
+          {errors.userName && touched.userName && (
+            <Text style={styles.errorText}>{errors.userName}</Text>
+          )}
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Input
+            placeholder="Enter password"
+            activePlaceholder="Password"
+            inputProps={{
+              value: values.password,
+              onChangeText: handleChange('password'),
+              onBlur: handleBlur('password') as unknown as FormikHandleBlurType,
+            }}
+          />
+
+          {errors.password && touched.password && (
+            <Text style={styles.errorText}>{errors.password}</Text>
+          )}
+        </View>
+      </>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   inputContainer: {
@@ -33,7 +70,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  gradientButton: {
-    marginTop: 16,
+  errorText: {
+    color: Colors.primaryRed,
+    fontSize: 12,
+    marginTop: 4,
   },
 });
