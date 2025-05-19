@@ -1,2 +1,2 @@
 export * from './GradientButton';
-export * from './SafeAreaInsectsView';
+export * from './Input';
