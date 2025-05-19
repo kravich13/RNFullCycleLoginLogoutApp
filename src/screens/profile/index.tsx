@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { Colors, Fonts } from '@wearepush/shared/consts';
-import { EAuthRoutes } from '@wearepush/shared/enums';
+import { EAuthRoutes, EReactQueryKeys } from '@wearepush/shared/enums';
 import { useAuthStoreValue } from '@wearepush/shared/libs';
 import { AuthStackScreenProps } from '@wearepush/shared/types';
 import React, { useCallback, useLayoutEffect } from 'react';
@@ -25,7 +25,7 @@ export const ProfileScreen: React.FC<AuthStackScreenProps<EAuthRoutes.Profile>> 
 
   const handleLogout = useCallback(async () => {
     await Keychain.resetGenericPassword();
-    queryClient.removeQueries({ queryKey: ['currentUserData'] });
+    queryClient.removeQueries({ queryKey: [EReactQueryKeys.CurrentUserData] });
     clearUser();
   }, [queryClient, clearUser]);
 

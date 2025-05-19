@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useQuery } from '@tanstack/react-query';
 import { getCurrentUserRequest } from '@wearepush/shared/api';
 import { Colors } from '@wearepush/shared/consts';
+import { EReactQueryKeys } from '@wearepush/shared/enums';
 import { useAuthStoreValue } from '@wearepush/shared/libs';
 import { IUserDataResponse } from '@wearepush/shared/types';
 import React, { useEffect } from 'react';
@@ -19,7 +20,7 @@ export const Navigation = () => {
   const setNotAuth = useAuthStoreValue('setNotAuth');
 
   const { isLoading, error } = useQuery<IUserDataResponse, Error>({
-    queryKey: ['currentUserData'],
+    queryKey: [EReactQueryKeys.CurrentUserData],
     queryFn: () => getCurrentUserRequest(accessToken),
     enabled: Boolean(accessToken) && isAuth === false,
     retry: false,
