@@ -9,7 +9,7 @@ export function App(): React.JSX.Element {
   return (
     <SafeAreaProvider>
       <View style={styles.container}>
-        <StatusBar barStyle={'light-content'} backgroundColor={Colors.lighter} />
+        <StatusBar barStyle="dark-content" backgroundColor={Colors.lighter} />
 
         <ErrorBoundary>
           <Navigation />
