@@ -2,7 +2,7 @@ import { Colors } from '@wearepush/shared/consts';
 import { IHandleFormikChange } from '@wearepush/shared/types';
 import { Input } from '@wearepush/shared/ui';
 import { FormikErrors, FormikTouched } from 'formik';
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import {
   NativeSyntheticEvent,
   StyleSheet,
@@ -19,10 +19,34 @@ interface LoginFormProps extends IHandleFormikChange<keyof ILoginFormValues> {
   errors: FormikErrors<ILoginFormValues>;
   touched: FormikTouched<ILoginFormValues>;
   handleBlur: (field: keyof ILoginFormValues) => void;
+  setErrorBannerMessage: (message: string | null) => void;
 }
 
 export const LoginForm = memo(
-  ({ values, handleChange, errors, touched, handleBlur }: LoginFormProps) => {
+  ({
+    values,
+    handleChange,
+    errors,
+    touched,
+    handleBlur,
+    setErrorBannerMessage,
+  }: LoginFormProps) => {
+    const onChangeUsername = useCallback(
+      (text: string) => {
+        handleChange('userName')(text);
+        setErrorBannerMessage(null);
+      },
+      [handleChange, setErrorBannerMessage],
+    );
+
+    const onChangePassword = useCallback(
+      (text: string) => {
+        handleChange('password')(text);
+        setErrorBannerMessage(null);
+      },
+      [handleChange, setErrorBannerMessage],
+    );
+
     return (
       <>
         <View style={[styles.inputContainer, styles.firstInputContainer]}>
@@ -32,7 +56,8 @@ export const LoginForm = memo(
             error={Boolean(errors.userName)}
             inputProps={{
               value: values.userName,
-              onChangeText: handleChange('userName'),
+              clearButtonMode: 'while-editing',
+              onChangeText: onChangeUsername,
               onBlur: handleBlur('userName') as unknown as FormikHandleBlurType,
             }}
           />
@@ -49,7 +74,9 @@ export const LoginForm = memo(
             error={Boolean(errors.password)}
             inputProps={{
               value: values.password,
-              onChangeText: handleChange('password'),
+              secureTextEntry: true,
+              clearButtonMode: 'while-editing',
+              onChangeText: onChangePassword,
               onBlur: handleBlur('password') as unknown as FormikHandleBlurType,
             }}
           />

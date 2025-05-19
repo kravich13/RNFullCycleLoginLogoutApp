@@ -1,5 +1,7 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ILoginFormValues, LoginForm } from '@wearepush/entities/login';
-import { GradientButton } from '@wearepush/shared/ui';
+import { loginRequest } from '@wearepush/shared/api';
+import { ErrorBanner, GradientButton } from '@wearepush/shared/ui';
 import { useFormik } from 'formik';
 import React, { useCallback, useState } from 'react';
 import { Dimensions, LayoutChangeEvent, ScrollView, StyleSheet, View } from 'react-native';
@@ -14,7 +16,10 @@ const loginSchema = z.object({
 });
 
 export const LoginScreen = () => {
+  const queryClient = useQueryClient();
+
   const [formHeight, setFormHeight] = useState<number | null>(null);
+  const [errorBannerMessage, setErrorBannerMessage] = useState<string | null>(null);
 
   const handleFormLayout = useCallback(
     (e: LayoutChangeEvent) => {
@@ -25,13 +30,28 @@ export const LoginScreen = () => {
     [formHeight],
   );
 
+  const { mutate: login, isPending } = useMutation({
+    mutationFn: (values: ILoginFormValues) =>
+      loginRequest({
+        username: values.userName,
+        password: values.password,
+        expiresInMins: 5,
+      }),
+    onError: error => {
+      setErrorBannerMessage(error.message);
+    },
+    onSuccess: data => {
+      queryClient.setQueryData(['currentUserData'], data);
+    },
+  });
+
   const paddingTop = formHeight !== null ? Math.max((screenHeight - formHeight) / 2, 0) : 0;
 
   const { values, errors, touched, isValid, handleBlur, handleChange, handleSubmit } =
     useFormik<ILoginFormValues>({
       initialValues: {
-        userName: '',
-        password: '',
+        userName: 'emilys',
+        password: 'emilyspass',
       },
       validate: values => {
         const result = loginSchema.safeParse(values);
@@ -50,7 +70,7 @@ export const LoginScreen = () => {
         return validateErros;
       },
       onSubmit: values => {
-        console.log(values);
+        login(values);
       },
     });
 
@@ -71,13 +91,18 @@ export const LoginScreen = () => {
             touched={touched}
             handleChange={handleChange}
             handleBlur={handleBlur}
+            setErrorBannerMessage={setErrorBannerMessage}
           />
+
+          {errorBannerMessage && (
+            <ErrorBanner message={errorBannerMessage} containerStyle={styles.errorBanner} />
+          )}
 
           <GradientButton
             title="Login"
             fullWidth
             style={styles.gradientButton}
-            disabled={!isValid}
+            disabled={!isValid || isPending || !touched}
             onPress={onSubmit}
           />
         </View>
@@ -100,6 +125,10 @@ const styles = StyleSheet.create({
   formContainer: {
     width: '100%',
     maxWidth: 400,
+  },
+
+  errorBanner: {
+    marginTop: 13,
   },
 
   gradientButton: {

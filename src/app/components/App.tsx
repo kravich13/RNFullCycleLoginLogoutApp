@@ -1,9 +1,12 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Colors } from '@wearepush/shared/consts';
 import React from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Navigation } from '../navigation';
 import { ErrorBoundary } from './ErrorBoundary';
+
+const queryClient = new QueryClient();
 
 export function App(): React.JSX.Element {
   return (
@@ -12,7 +15,9 @@ export function App(): React.JSX.Element {
         <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
 
         <ErrorBoundary>
-          <Navigation />
+          <QueryClientProvider client={queryClient}>
+            <Navigation />
+          </QueryClientProvider>
         </ErrorBoundary>
       </View>
     </SafeAreaProvider>

@@ -5,7 +5,7 @@ import {
   IUserDataResponse,
 } from '../types';
 
-const API_URL = 'https://dummyjson.com/';
+const API_URL = 'https://dummyjson.com';
 
 export const loginRequest = async (data: ILoginRequest): Promise<IUserDataResponse> => {
   const response = await fetch(`${API_URL}/auth/login`, {
@@ -16,7 +16,17 @@ export const loginRequest = async (data: ILoginRequest): Promise<IUserDataRespon
   });
 
   if (!response.ok) {
-    throw new Error('Failed to login');
+    let errorMessage = 'Failed to login';
+
+    try {
+      const errorData = await response.json();
+
+      if (errorData?.message) {
+        errorMessage = errorData.message;
+      }
+    } finally {
+      throw new Error(errorMessage);
+    }
   }
 
   return response.json();

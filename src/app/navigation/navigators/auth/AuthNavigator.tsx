@@ -8,7 +8,7 @@ const Stack = createNativeStackNavigator<AuthStackParamList>();
 
 export const AuthNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName={EAuthRoutes.Profile} screenOptions={{ headerShown: false }}>
+    <Stack.Navigator initialRouteName={EAuthRoutes.Profile} screenOptions={{ headerShown: true }}>
       <Stack.Screen name={EAuthRoutes.Profile} component={ProfileScreen} />
     </Stack.Navigator>
   );
