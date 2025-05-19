@@ -1,10 +1,12 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { ILoginFormValues, LoginForm } from '@wearepush/entities/login';
 import { loginRequest } from '@wearepush/shared/api';
+import { useAuthStoreValue } from '@wearepush/shared/libs';
 import { ErrorBanner, GradientButton } from '@wearepush/shared/ui';
 import { useFormik } from 'formik';
 import React, { useCallback, useState } from 'react';
 import { Dimensions, LayoutChangeEvent, ScrollView, StyleSheet, View } from 'react-native';
+import * as Keychain from 'react-native-keychain';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
@@ -16,10 +18,10 @@ const loginSchema = z.object({
 });
 
 export const LoginScreen = () => {
-  const queryClient = useQueryClient();
-
   const [formHeight, setFormHeight] = useState<number | null>(null);
   const [errorBannerMessage, setErrorBannerMessage] = useState<string | null>(null);
+
+  const setUser = useAuthStoreValue('setUser');
 
   const handleFormLayout = useCallback(
     (e: LayoutChangeEvent) => {
@@ -35,13 +37,14 @@ export const LoginScreen = () => {
       loginRequest({
         username: values.userName,
         password: values.password,
-        expiresInMins: 5,
+        expiresInMins: 1,
       }),
     onError: error => {
       setErrorBannerMessage(error.message);
     },
-    onSuccess: data => {
-      queryClient.setQueryData(['currentUserData'], data);
+    onSuccess: async data => {
+      await Keychain.setGenericPassword('currentUserData', JSON.stringify(data));
+      setUser(data);
     },
   });
 

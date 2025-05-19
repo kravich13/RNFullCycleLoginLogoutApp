@@ -1,12 +1,33 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useQueryClient } from '@tanstack/react-query';
 import { ProfileScreen } from '@wearepush/screens/profile';
+import { getCurrentUserRequest } from '@wearepush/shared/api';
 import { EAuthRoutes } from '@wearepush/shared/enums';
+import { useAuthStoreValue } from '@wearepush/shared/libs';
 import { AuthStackParamList } from '@wearepush/shared/types';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { AppState } from 'react-native';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
 export const AuthNavigator = () => {
+  const queryClient = useQueryClient();
+
+  const accessToken = useAuthStoreValue('accessToken');
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', async nextAppState => {
+      if (nextAppState === 'active') {
+        queryClient.fetchQuery({
+          queryKey: ['currentUserData'],
+          queryFn: () => getCurrentUserRequest(accessToken),
+        });
+      }
+    });
+
+    return () => subscription.remove();
+  }, [accessToken, queryClient]);
+
   return (
     <Stack.Navigator initialRouteName={EAuthRoutes.Profile} screenOptions={{ headerShown: true }}>
       <Stack.Screen name={EAuthRoutes.Profile} component={ProfileScreen} />
