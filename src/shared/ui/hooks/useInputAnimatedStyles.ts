@@ -58,7 +58,11 @@ export const useInputAnimatedStyles = ({ value, error, focused }: UseInputAnimat
     }),
     color: animatedColorState.interpolate({
       inputRange: [0, 1, 2],
-      outputRange: ['#101828', '#101828', Colors.primaryRed],
+      outputRange: [Colors.primaryBlack, Colors.primaryBlack, Colors.primaryRed],
+    }),
+    fontSize: animated.interpolate({
+      inputRange: [0, 1],
+      outputRange: [16, 12],
     }),
   };
 

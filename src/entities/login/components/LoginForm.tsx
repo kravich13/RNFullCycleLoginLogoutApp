@@ -1,4 +1,4 @@
-import { Colors } from '@wearepush/shared/consts';
+import { Colors, Fonts } from '@wearepush/shared/consts';
 import { IHandleFormikChange } from '@wearepush/shared/types';
 import { Input } from '@wearepush/shared/ui';
 import { FormikErrors, FormikTouched } from 'formik';
@@ -25,11 +25,11 @@ interface LoginFormProps extends IHandleFormikChange<keyof ILoginFormValues> {
 export const LoginForm = memo(
   ({
     values,
-    handleChange,
     errors,
     touched,
-    handleBlur,
     setErrorBannerMessage,
+    handleBlur,
+    handleChange,
   }: LoginFormProps) => {
     const onChangeUsername = useCallback(
       (text: string) => {
@@ -100,6 +100,8 @@ const styles = StyleSheet.create({
   },
 
   errorText: {
+    fontFamily: Fonts.NotoSans,
+    fontWeight: '400',
     color: Colors.primaryRed,
     fontSize: 12,
     marginTop: 4,

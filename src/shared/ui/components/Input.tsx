@@ -81,6 +81,7 @@ export const Input: React.FC<InputProps> = memo(
           selectionColor={Colors.primaryBlue}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          clearButtonMode="while-editing"
           {...restInputProps}
         />
       </View>
