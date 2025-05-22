@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { Colors, Fonts } from '@wearepush/shared/consts';
 import { EAuthRoutes, EReactQueryKeys } from '@wearepush/shared/enums';
-import { useAuthStoreValue } from '@wearepush/shared/libs';
+import { useUserStoreValue } from '@wearepush/shared/hooks';
 import { AuthStackScreenProps } from '@wearepush/shared/types';
 import React, { useCallback, useLayoutEffect } from 'react';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -9,9 +9,9 @@ import * as Keychain from 'react-native-keychain';
 export const ProfileScreen: React.FC<AuthStackScreenProps<EAuthRoutes.Profile>> = ({
   navigation,
 }) => {
-  const clearUser = useAuthStoreValue('clearUser');
-  const firstName = useAuthStoreValue('firstName');
-  const lastName = useAuthStoreValue('lastName');
+  const firstName = useUserStoreValue('firstName');
+  const lastName = useUserStoreValue('lastName');
+  const clearUser = useUserStoreValue('clearUser');
 
   const queryClient = useQueryClient();
 

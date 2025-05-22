@@ -1,7 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { ILoginFormValues, LoginForm } from '@wearepush/entities/login';
-import { loginRequest } from '@wearepush/shared/api';
-import { useAuthStoreValue } from '@wearepush/shared/libs';
+import { ILoginFormValues, LoginForm, loginRequest } from '@wearepush/features/login';
 import { ErrorBanner, GradientButton } from '@wearepush/shared/ui';
 import { useFormik } from 'formik';
 import React, { useCallback, useState } from 'react';
@@ -21,7 +19,7 @@ export const LoginScreen = () => {
   const [formHeight, setFormHeight] = useState<number | null>(null);
   const [errorBannerMessage, setErrorBannerMessage] = useState<string | null>(null);
 
-  const setUser = useAuthStoreValue('setUser');
+  // const setUser = useAuthStoreValue('setUser');
 
   const handleFormLayout = useCallback(
     (e: LayoutChangeEvent) => {
@@ -44,7 +42,7 @@ export const LoginScreen = () => {
     },
     onSuccess: async data => {
       await Keychain.setGenericPassword('currentUserData', JSON.stringify(data));
-      setUser(data);
+      // setUser(data);
     },
   });
 

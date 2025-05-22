@@ -1,10 +1,11 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useQuery } from '@tanstack/react-query';
+import { useSessionStoreValue } from '@wearepush/features/login';
 import { getCurrentUserRequest } from '@wearepush/shared/api';
 import { Colors } from '@wearepush/shared/consts';
 import { EReactQueryKeys } from '@wearepush/shared/enums';
-import { useAuthStoreValue } from '@wearepush/shared/libs';
+import { useUserStoreValue } from '@wearepush/shared/hooks';
 import { IUserDataResponse } from '@wearepush/shared/types';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
@@ -14,14 +15,15 @@ import { AuthNavigator, NotAuthNavigator } from './navigators';
 const RootStack = createNativeStackNavigator();
 
 export const Navigation = () => {
-  const isAuth = useAuthStoreValue('isAuth');
-  const accessToken = useAuthStoreValue('accessToken');
-  const setUser = useAuthStoreValue('setUser');
-  const setNotAuth = useAuthStoreValue('setNotAuth');
+  const isAuth = useSessionStoreValue('isAuth');
+  const accessToken = useSessionStoreValue('accessToken');
+  const setNotAuth = useSessionStoreValue('setNotAuth');
+  const setUser = useUserStoreValue('setUser');
+  const clearUser = useUserStoreValue('clearUser');
 
   const { isLoading, error } = useQuery<IUserDataResponse, Error>({
     queryKey: [EReactQueryKeys.CurrentUserData],
-    queryFn: () => getCurrentUserRequest(accessToken),
+    queryFn: () => getCurrentUserRequest(accessToken || ''),
     enabled: Boolean(accessToken) && isAuth === false,
     retry: false,
   });
@@ -31,6 +33,7 @@ export const Navigation = () => {
       (async () => {
         await Keychain.resetGenericPassword();
         setNotAuth();
+        clearUser();
       })();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -50,9 +53,11 @@ export const Navigation = () => {
           setUser(userData);
         } catch (e) {
           setNotAuth();
+          clearUser();
         }
       } else {
         setNotAuth();
+        clearUser();
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
