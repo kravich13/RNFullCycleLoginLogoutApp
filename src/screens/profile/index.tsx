@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { useSessionStoreValue } from '@wearepush/features/login';
 import { Colors, Fonts } from '@wearepush/shared/consts';
 import { EAuthRoutes, EReactQueryKeys } from '@wearepush/shared/enums';
 import { useUserStoreValue } from '@wearepush/shared/hooks';
@@ -12,6 +13,7 @@ export const ProfileScreen: React.FC<AuthStackScreenProps<EAuthRoutes.Profile>> 
   const firstName = useUserStoreValue('firstName');
   const lastName = useUserStoreValue('lastName');
   const clearUser = useUserStoreValue('clearUser');
+  const setNotAuth = useSessionStoreValue('setNotAuth');
 
   const queryClient = useQueryClient();
 
@@ -27,7 +29,9 @@ export const ProfileScreen: React.FC<AuthStackScreenProps<EAuthRoutes.Profile>> 
     await Keychain.resetGenericPassword();
     queryClient.removeQueries({ queryKey: [EReactQueryKeys.CurrentUserData] });
     clearUser();
-  }, [queryClient, clearUser]);
+    setNotAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryClient]);
 
   return (
     <SafeAreaView style={styles.container}>
