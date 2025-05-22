@@ -3,8 +3,8 @@ import { Colors } from '@wearepush/shared/consts';
 import React from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Navigation } from '../navigation';
-import { ErrorBoundary } from './ErrorBoundary';
+import { ErrorBoundary } from './components';
+import { Navigation } from './navigation';
 
 const queryClient = new QueryClient();
 
