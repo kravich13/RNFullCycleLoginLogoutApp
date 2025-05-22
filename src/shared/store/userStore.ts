@@ -8,7 +8,7 @@ const initialState: IUserStoreInitialState = {
   firstName: '',
   lastName: '',
   gender: '',
-  image: '',
+  imageUrl: '',
 };
 
 export const useUserStore = create<IUserStore>(set => ({

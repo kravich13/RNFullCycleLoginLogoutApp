@@ -1,5 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
-import { ILoginFormValues, LoginForm, loginRequest } from '@wearepush/features/login';
+import {
+  EKeychain,
+  IKeychainLoginDataCredentials,
+  ILoginFormValues,
+  LoginForm,
+  loginRequest,
+  useSessionStoreValue,
+} from '@wearepush/features/login';
+import { useUserStoreValue } from '@wearepush/shared/hooks';
 import { ErrorBanner, GradientButton } from '@wearepush/shared/ui';
 import { useFormik } from 'formik';
 import React, { useCallback, useState } from 'react';
@@ -16,10 +24,11 @@ const loginSchema = z.object({
 });
 
 export const LoginScreen = () => {
+  const setUser = useUserStoreValue('setUser');
+  const setAuth = useSessionStoreValue('setAuth');
+
   const [formHeight, setFormHeight] = useState<number | null>(null);
   const [errorBannerMessage, setErrorBannerMessage] = useState<string | null>(null);
-
-  // const setUser = useAuthStoreValue('setUser');
 
   const handleFormLayout = useCallback(
     (e: LayoutChangeEvent) => {
@@ -41,8 +50,39 @@ export const LoginScreen = () => {
       setErrorBannerMessage(error.message);
     },
     onSuccess: async data => {
-      await Keychain.setGenericPassword('currentUserData', JSON.stringify(data));
-      // setUser(data);
+      const {
+        id,
+        gender = '',
+        email = '',
+        firstName = '',
+        lastName = '',
+        username = '',
+        image: imageUrl = '',
+        accessToken,
+        refreshToken,
+      } = data;
+
+      if (!accessToken || !refreshToken || !id) {
+        setErrorBannerMessage('Something went wrong');
+        return;
+      }
+
+      const credentials: IKeychainLoginDataCredentials = {
+        accessToken,
+        refreshToken,
+        id,
+        email,
+        firstName,
+        lastName,
+        username,
+        imageUrl,
+        gender,
+      };
+
+      await Keychain.setGenericPassword(EKeychain.LoginData, JSON.stringify(credentials));
+
+      setAuth(accessToken, refreshToken);
+      setUser({ id, email, firstName, lastName, username, gender, imageUrl });
     },
   });
 

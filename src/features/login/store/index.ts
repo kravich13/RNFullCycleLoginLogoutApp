@@ -9,6 +9,7 @@ const initialState: ISessionStoreInitialState = {
 export const useSessionStore = create<ISessionStore>(set => ({
   ...initialState,
 
-  setAuth: token => set({ isAuth: true, accessToken: token }),
-  setNotAuth: () => set({ ...initialState }),
+  setAuth: (accessToken: string, refreshToken: string) =>
+    set({ isAuth: true, accessToken, refreshToken }),
+  setNotAuth: () => set({ ...initialState, isAuth: false }),
 }));

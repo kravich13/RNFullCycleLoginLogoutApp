@@ -1,6 +1,6 @@
 export type IUserStoreInitialState = Pick<
   IUserStore,
-  'id' | 'username' | 'email' | 'firstName' | 'lastName' | 'gender' | 'image'
+  'id' | 'username' | 'email' | 'firstName' | 'lastName' | 'gender' | 'imageUrl'
 >;
 
 export interface IUserStore {
@@ -10,7 +10,7 @@ export interface IUserStore {
   firstName: string;
   lastName: string;
   gender: string;
-  image: string;
+  imageUrl: string;
 
   setUser: (user: IUserStoreInitialState) => void;
   clearUser: () => void;

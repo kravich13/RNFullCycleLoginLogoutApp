@@ -1,12 +1,8 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useQuery } from '@tanstack/react-query';
-import { useSessionStoreValue } from '@wearepush/features/login';
-import { getCurrentUserRequest } from '@wearepush/shared/api';
+import { IKeychainLoginDataCredentials, useSessionStoreValue } from '@wearepush/features/login';
 import { Colors } from '@wearepush/shared/consts';
-import { EReactQueryKeys } from '@wearepush/shared/enums';
 import { useUserStoreValue } from '@wearepush/shared/hooks';
-import { IUserDataResponse } from '@wearepush/shared/types';
 import React, { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import * as Keychain from 'react-native-keychain';
@@ -16,28 +12,10 @@ const RootStack = createNativeStackNavigator();
 
 export const Navigation = () => {
   const isAuth = useSessionStoreValue('isAuth');
-  const accessToken = useSessionStoreValue('accessToken');
+  const setAuth = useSessionStoreValue('setAuth');
   const setNotAuth = useSessionStoreValue('setNotAuth');
   const setUser = useUserStoreValue('setUser');
   const clearUser = useUserStoreValue('clearUser');
-
-  const { isLoading, error } = useQuery<IUserDataResponse, Error>({
-    queryKey: [EReactQueryKeys.CurrentUserData],
-    queryFn: () => getCurrentUserRequest(accessToken || ''),
-    enabled: Boolean(accessToken) && isAuth === false,
-    retry: false,
-  });
-
-  useEffect(() => {
-    if (error) {
-      (async () => {
-        await Keychain.resetGenericPassword();
-        setNotAuth();
-        clearUser();
-      })();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [error]);
 
   useEffect(() => {
     (async () => {
@@ -46,16 +24,18 @@ export const Navigation = () => {
       if (credentials) {
         try {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { refreshToken, ...userData } = JSON.parse(
+          const { refreshToken, accessToken, ...userData } = JSON.parse(
             credentials.password,
-          ) as IUserDataResponse;
+          ) as IKeychainLoginDataCredentials;
 
+          setAuth(accessToken, refreshToken);
           setUser(userData);
         } catch (e) {
           setNotAuth();
           clearUser();
         }
       } else {
+        console.log('no credentials');
         setNotAuth();
         clearUser();
       }
@@ -63,7 +43,7 @@ export const Navigation = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (isLoading || isAuth === undefined) {
+  if (isAuth === undefined) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color={Colors.primaryBlue} />
